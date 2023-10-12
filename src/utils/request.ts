@@ -1,5 +1,6 @@
+import router from '@/router'
 import { useUserStore } from '@/stores'
-import axios from 'axios'
+import axios, { AxiosError, type Method } from 'axios'
 import { showToast } from 'vant/lib/toast/function-call'
 
 const instance = axios.create({
@@ -30,10 +31,40 @@ instance.interceptors.response.use(
     // TODO 4. 摘取核心响应数据
     return res.data
   },
-  (err) => {
+  (err: AxiosError) => {
     // TODO 5. 处理401错误
+    if (err.response?.status === 401) {
+      //清空用户数据
+      const store = useUserStore()
+      store.delUser()
+      //跳转登录，带上接口失效所在地址的数据,登录完成后回跳使用
+      router.push({
+        path: '/login',
+        query: {
+          returnUrl: router.currentRoute.value.fullPath
+        }
+      })
+    }
     return Promise.reject(err)
   }
 )
 
 export default instance
+
+type Data<T> = {
+  code: number
+  message: string
+  data: T
+}
+
+export const request = <T>(
+  url: string,
+  method: Method = 'GET',
+  submitData?: object
+) => {
+  return instance.request<any, Data<T>>({
+    url,
+    method,
+    [method.toUpperCase() === 'GET' ? 'params' : 'data']: submitData
+  })
+}
