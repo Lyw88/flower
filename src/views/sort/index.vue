@@ -51,6 +51,7 @@ const click_nav = async (index: number) => {
     // console.log(items.value[index].s_id)
     const res = await Type_detailApi(items.value[index].s_id)
     type_data.value = res
+    console.log(res)
     if (Array.isArray(type_data.value)) {
       has_img.value = type_data.value.filter((item: any) => item.has_img === 1)
       null_img.value = type_data.value.filter((item: any) => item.has_img === 0)
@@ -118,7 +119,7 @@ onMounted(() => {
                   width="56"
                   height="56"
                   fit="cover"
-                  src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                  :src="'http://localhost:3000/sort/' + items.t_img"
                 />
                 <span>{{ items.t_name }}</span>
               </van-col>

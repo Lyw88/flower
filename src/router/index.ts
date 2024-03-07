@@ -32,11 +32,6 @@ const router = createRouter({
           meta: { title: '分类' }
         },
         {
-          path: '/find',
-          component: () => import('@/views/find/index.vue'),
-          meta: { title: '发现' }
-        },
-        {
           path: '/user',
           component: () => import('@/views/user/index.vue'),
           meta: { title: '我的' }
@@ -57,6 +52,11 @@ const router = createRouter({
       path: '/product',
       component: () => import('@/views/product/index.vue'),
       meta: { title: '商品浏览' }
+    },
+    {
+      path: '/items',
+      component: () => import('@/views/product/items.vue'),
+      meta: { title: '商品详情' }
     }
   ]
 })

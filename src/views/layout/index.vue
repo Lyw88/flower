@@ -16,12 +16,12 @@
           <cp-icon :name="`home-sort-${active ? 'active' : 'default'}`" />
         </template>
       </van-tabbar-item>
-      <van-tabbar-item to="/find">
+      <!-- <van-tabbar-item to="/find">
         发现
         <template #icon="{ active }">
           <cp-icon :name="`home-find-${active ? 'active' : 'default'}`" />
         </template>
-      </van-tabbar-item>
+      </van-tabbar-item> -->
       <van-tabbar-item to="/shopcar">
         购物车
         <template #icon="{ active }">

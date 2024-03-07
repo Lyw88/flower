@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from '@/router'
 import { searchApi, TagSearchApi } from '@/services/type'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
@@ -9,6 +10,7 @@ const getImageUrl = (name: string) => {
 
 const select = ref(0)
 //排序
+let sortOrder = ref<any>(0)
 const changeselect = async (index: number, sort: string, method: string) => {
   select.value = index
   loadData(sort, method)
@@ -56,10 +58,26 @@ onMounted(() => {
             >销量</a
           ></van-col
         >
-        <van-col span="8" @click="changeselect(2, 'p_price', 'desc')">
+        <van-col
+          span="8"
+          @click="
+            sortOrder === 0
+              ? (changeselect(2, 'p_price', 'asc'), (sortOrder = 1))
+              : (changeselect(2, 'p_price', 'desc'), (sortOrder = 0))
+          "
+        >
           <a href="javascript:;" :class="{ active: select === 2 }">
             价格
-            <cp-icon class="icons" :name="`product-sort`"></cp-icon>
+            <cp-icon
+              class="icons"
+              :name="
+                select === 2
+                  ? sortOrder === 0
+                    ? 'product-sort_desc'
+                    : 'product-sort_asc'
+                  : 'product-sort'
+              "
+            ></cp-icon>
           </a>
         </van-col>
       </van-row>
@@ -67,7 +85,12 @@ onMounted(() => {
     <!-- 商品卡片 -->
     <div class="item">
       <van-row>
-        <van-col span="12" v-for="item in data" :key="item.p_id">
+        <van-col
+          span="12"
+          v-for="item in data"
+          :key="item.p_id"
+          @click="router.push({ path: '/items', query: { p_id: item.p_id } })"
+        >
           <van-image
             width="100%"
             fit="cover"
