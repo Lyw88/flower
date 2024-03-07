@@ -48,10 +48,8 @@ const has_img = ref()
 const null_img = ref()
 const click_nav = async (index: number) => {
   try {
-    // console.log(items.value[index].s_id)
     const res = await Type_detailApi(items.value[index].s_id)
     type_data.value = res
-    console.log(res)
     if (Array.isArray(type_data.value)) {
       has_img.value = type_data.value.filter((item: any) => item.has_img === 1)
       null_img.value = type_data.value.filter((item: any) => item.has_img === 0)

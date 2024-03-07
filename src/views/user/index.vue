@@ -11,11 +11,8 @@ const store = useUserStore()
 const user_info = ref()
 const loadData = async () => {
   try {
-    console.log(store.user?.u_id)
-
     const res = await getuserinfoApi(store.user?.u_id || 0)
     user_info.value = res.data
-    console.log(user_info.value)
   } catch (err) {
     console.log(err)
   }

@@ -30,7 +30,6 @@ const loadData = async (sort: string, method: string) => {
       ? await searchApi(config)
       : await TagSearchApi(config)
     data.value = res
-    // console.log(data.value)
   } catch (err) {
     console.log(err)
   }
@@ -87,15 +86,20 @@ onMounted(() => {
       <van-row>
         <van-col
           span="12"
-          v-for="item in data"
-          :key="item.p_id"
+          v-for="(item, index) in data"
+          :key="index"
           @click="router.push({ path: '/items', query: { p_id: item.p_id } })"
         >
           <van-image
             width="100%"
             fit="cover"
             round
-            :src="getImageUrl(`9012709.jpg`)"
+            :src="
+              item.p_image != null
+                ? 'http://localhost:3000/upload/' +
+                  `${JSON.parse(item.p_image)[0]}`
+                : 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
+            "
           />
           <div class="info">
             <div class="title">{{ item.p_name }}</div>
@@ -145,6 +149,7 @@ onMounted(() => {
           border-left: 4px solid #f3f5f7;
         }
         .van-image {
+          height: 194px;
           border-radius: $radius $radius 0 0;
         }
         .info {

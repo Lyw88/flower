@@ -1,67 +1,84 @@
 <!-- eslint-disable vue/multi-word-component-names -->
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { product_itemApi } from '@/services/product'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const info = ref()
+const load = async () => {
+  const res = await product_itemApi(route.query.p_id)
+  info.value = res
+  console.log(res)
+}
+
+onMounted(async () => {
+  await load()
+})
+</script>
 
 <template>
   <cpNavbar title="商品详情"></cpNavbar>
   <div class="items-page">
-    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item>
-        <van-image
-          fit="cover"
-          src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-        />
-      </van-swipe-item>
-      <!-- ------------------------------------------------------------------------- -->
-      <van-swipe-item>
-        <van-image
-          fit="cover"
-          src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-        />
-      </van-swipe-item>
-      <van-swipe-item>
-        <van-image
-          fit="cover"
-          src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-        />
-      </van-swipe-item>
-      <van-swipe-item>
-        <van-image
-          fit="cover"
-          src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-        />
-      </van-swipe-item>
-      <!-- -------------------------------------------------------------------------------- -->
-    </van-swipe>
     <!-- 商品信息 -->
+    <van-swipe class="my-swipe" :autoplay="2500" indicator-color="white">
+      <van-swipe-item v-for="item in info?.p_image" :key="item">
+        <van-image
+          fit="cover"
+          :src="'http://localhost:3000/upload/' + `${item}`"
+        />
+      </van-swipe-item>
+    </van-swipe>
     <div class="info">
       <div class="top">
-        <div class="price"><span>¥</span>275</div>
-        <div class="sale">已售2590件</div>
+        <div class="price"><span>¥</span>{{ info?.p_price }}</div>
+        <div class="sale">已售{{ info?.p_sale }}件</div>
       </div>
       <div class="bottom">
         <div class="left">
-          <div class="title">美丽绽放/3.8节定制款</div>
+          <div class="title">{{ info?.p_name }}</div>
           <div class="detail">粉色戴安娜12枝，紫色紫罗兰4枝，粉色洋牡丹3枝</div>
         </div>
         <div class="right"><van-icon name="star-o" />收藏</div>
       </div>
     </div>
     <!-- 配送地址 -->
-    <div class="address"></div>
+    <div class="address">
+      <van-cell-group>
+        <van-cell
+          :center="true"
+          title="花语"
+          :value="info.p_info"
+          v-if="info"
+        />
+        <van-cell title="配送" value="全国" />
+      </van-cell-group>
+    </div>
+    <!-- 加入购物车 -->
+    <van-action-bar>
+      <van-action-bar-icon icon="chat-o" text="客服" />
+      <van-action-bar-icon icon="cart-o" text="购物车" badge="5" />
+      <van-action-bar-button type="warning" text="加入购物车" />
+      <van-action-bar-button type="danger" text="立即购买" />
+    </van-action-bar>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .items-page {
-  padding-top: 46px;
+  padding: 46px 0 50px 0;
   .van-swipe {
     height: 409px;
+    .van-swipe-item {
+      width: 100%;
+    }
     .van-image {
+      width: 100%;
       height: 100%;
     }
   }
   .info {
-    // height: 150px;
     padding: 12px 16px;
     .top {
       display: flex;
@@ -106,11 +123,21 @@
       }
     }
   }
-  .address {
-    height: 67px;
+  :deep().address {
     margin: 11px;
     background-color: #fff;
     border-radius: 10px;
+    overflow: hidden;
+    .van-cell__title {
+      flex: 0.2;
+      width: 20px;
+      font-size: 12.6px;
+      font-weight: bold;
+    }
+    .van-cell__value {
+      text-align: left;
+      color: #232628;
+    }
   }
 }
 </style>
