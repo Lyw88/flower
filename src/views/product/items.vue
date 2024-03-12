@@ -1,16 +1,34 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { product_itemApi } from '@/services/product'
+import { product_itemApi, AddShopCarApi } from '@/services/product'
+import { useUserStore } from '@/stores'
+import { showToast } from 'vant'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+//调用接口
 const info = ref()
 const load = async () => {
   const res = await product_itemApi(route.query.p_id)
   info.value = res
   console.log(res)
+}
+
+//加入购物车
+const store = useUserStore()
+const addshopcar = async () => {
+  try {
+    const res = await AddShopCarApi({
+      u_id: store.user?.u_id,
+      p_id: info.value.p_id,
+      quantity: 1
+    })
+    showToast(res.message)
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 onMounted(async () => {
@@ -58,8 +76,17 @@ onMounted(async () => {
     <!-- 加入购物车 -->
     <van-action-bar>
       <van-action-bar-icon icon="chat-o" text="客服" />
-      <van-action-bar-icon icon="cart-o" text="购物车" badge="5" />
-      <van-action-bar-button type="warning" text="加入购物车" />
+      <van-action-bar-icon
+        icon="cart-o"
+        text="购物车"
+        badge="5"
+        @click="$router.push('/shopcar')"
+      />
+      <van-action-bar-button
+        type="warning"
+        text="加入购物车"
+        @click="addshopcar()"
+      />
       <van-action-bar-button type="danger" text="立即购买" />
     </van-action-bar>
   </div>

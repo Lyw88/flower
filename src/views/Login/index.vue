@@ -6,6 +6,8 @@ import { useUserStore } from '@/stores'
 import { showToast, showSuccessToast, type FormInstance } from 'vant'
 import { useRouter } from 'vue-router'
 import { onUnmounted } from 'vue'
+import { useShopCarStore } from '@/stores/modules/shopcar'
+import { LoadShopCarApi, product_itemApi } from '@/services/product'
 
 const mobile = ref<string>('13027941053')
 const password = ref<string>('abc12345')
@@ -49,8 +51,28 @@ const send = async () => {
   }, 1000)
 }
 
+const data = ref()
+const store = useUserStore()
+const car_store = useShopCarStore()
+const LoadData = async () => {
+  try {
+    const res = await LoadShopCarApi(store.user?.u_id)
+    data.value = res
+    if (Object.keys(data.value).length > 0) {
+      for (const item of data.value) {
+        const res = await product_itemApi(item.p_id)
+        item.content = res
+      }
+      car_store.getgoodslist(data.value)
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 onUnmounted(() => {
   window.clearInterval(timeId.value)
+  LoadData()
 })
 </script>
 
