@@ -4,9 +4,9 @@ import { searchApi, TagSearchApi } from '@/services/type'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
 
-const getImageUrl = (name: string) => {
-  return new URL(`../../assets/sort/${name}`, import.meta.url).href
-}
+// const getImageUrl = (name: string) => {
+//   return new URL(`../../assets/sort/${name}`, import.meta.url).href
+// }
 
 const select = ref(0)
 //排序
@@ -41,7 +41,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <cp-navbar title="搜索结果"></cp-navbar>
+  <cp-navbar
+    title="搜索结果"
+    right-text="主页"
+    @click-right="$router.push('/sort')"
+  ></cp-navbar>
 
   <div class="product-page">
     <!-- 排序 -->
@@ -113,6 +117,9 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+:deep().van-nav-bar__text {
+  color: black;
+}
 .product-page {
   padding-top: 46px;
   .sort {

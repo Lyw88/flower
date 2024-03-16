@@ -30,7 +30,7 @@ export const getuserinfoApi = (u_id: number | null) => {
 
 // ------------------------------------------地址---------------------------------------
 //获取用户收货地址
-export const addressInfoApi = (u_id: number) => {
+export const addressInfoApi = (u_id: number | undefined) => {
   return request<addressInfo>('/address', 'get', { u_id })
 }
 

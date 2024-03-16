@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores'
 import { onMounted } from 'vue'
+import type { AddressListAddress } from 'vant'
 import {
   addressInfoApi,
   editaddressApi,
@@ -12,6 +13,8 @@ import { ref } from 'vue'
 import { showToast } from 'vant'
 import type { addressInfo } from '@/types/user'
 import { areaList } from '@vant/area-data'
+import { orderUseStore } from '@/stores/modules/order'
+import router from '@/router'
 
 const store = useUserStore()
 
@@ -69,6 +72,7 @@ const onEdit = (item: any, index: any) => {
     isDefault: item.isDefault,
     id: list.value[index].id
   }
+  console.log(item, index)
 }
 
 //保存地址
@@ -126,9 +130,19 @@ const toggledefault = async () => {
   }
 }
 
+//选择
+const order_store = orderUseStore()
+const selectFn = (item: any) => {
+  order_store.getaddress(item)
+  router.back()
+}
+
 //加载渲染
-onMounted(() => {
+
+const historyBack = ref(false)
+onMounted(async () => {
   LoadData()
+  historyBack.value = history.state?.back === '/order' ? true : false
 })
 </script>
 
@@ -139,8 +153,10 @@ onMounted(() => {
       v-model="chosenAddressId"
       :list="list"
       default-tag-text="默认"
+      :switchable="historyBack ? true : false"
       @add="onAdd"
       @edit="onEdit"
+      @select="selectFn"
     />
 
     <!-- 弹出层 -->

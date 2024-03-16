@@ -2,10 +2,12 @@
 <script setup lang="ts">
 import { product_itemApi, AddShopCarApi } from '@/services/product'
 import { useUserStore } from '@/stores'
+import { useShopCarStore } from '@/stores/modules/shopcar'
 import { showToast } from 'vant'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+const car_store = useShopCarStore()
 const route = useRoute()
 
 //调用接口
@@ -13,7 +15,6 @@ const info = ref()
 const load = async () => {
   const res = await product_itemApi(route.query.p_id)
   info.value = res
-  console.log(res)
 }
 
 //加入购物车
@@ -25,6 +26,7 @@ const addshopcar = async () => {
       p_id: info.value.p_id,
       quantity: 1
     })
+    await car_store.LoadData()
     showToast(res.message)
   } catch (err) {
     console.log(err)
@@ -37,7 +39,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <cpNavbar title="商品详情"></cpNavbar>
+  <cpNavbar
+    title="商品详情"
+    right-text="主页"
+    @click-right="$router.push('/sort')"
+  ></cpNavbar>
   <div class="items-page">
     <!-- 商品信息 -->
     <van-swipe class="my-swipe" :autoplay="2500" indicator-color="white">
@@ -79,7 +85,7 @@ onMounted(async () => {
       <van-action-bar-icon
         icon="cart-o"
         text="购物车"
-        badge="5"
+        :badge="car_store.goodslist?.length"
         @click="$router.push('/shopcar')"
       />
       <van-action-bar-button
@@ -93,6 +99,9 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+:deep().van-nav-bar__text {
+  color: black;
+}
 .items-page {
   padding: 46px 0 50px 0;
   .van-swipe {

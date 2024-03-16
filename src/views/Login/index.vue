@@ -3,11 +3,10 @@ import { ref } from 'vue'
 import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
 import { loginByPassword, loginByMobile } from '@/services/user'
 import { useUserStore } from '@/stores'
-import { showToast, showSuccessToast, type FormInstance } from 'vant'
+import { showToast, type FormInstance, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { onUnmounted } from 'vue'
 import { useShopCarStore } from '@/stores/modules/shopcar'
-import { LoadShopCarApi, product_itemApi } from '@/services/product'
 
 const mobile = ref<string>('13027941053')
 const password = ref<string>('abc12345')
@@ -21,18 +20,25 @@ const router = useRouter()
 const test = ref()
 // 表单提交
 const login = async () => {
-  if (!agreen.value) {
-    return showToast('请勾选协议')
+  try {
+    if (!agreen.value) {
+      return showToast('请勾选协议')
+    }
+    // 验证完毕，进行登录
+    const res = isPass.value
+      ? await loginByPassword(mobile.value, password.value)
+      : await loginByMobile(mobile.value, code.value)
+    const userStore = useUserStore()
+    userStore.getUser(res.data)
+    test.value = res.data
+    router.push(
+      (router.currentRoute.value.query.returnUrl as string) || '/user'
+    )
+    car_store.LoadData()
+    return showSuccessToast('登陆成功')
+  } catch (err) {
+    console.log(err)
   }
-  // 验证完毕，进行登录
-  const res = isPass.value
-    ? await loginByPassword(mobile.value, password.value)
-    : await loginByMobile(mobile.value, code.value)
-  const userStore = useUserStore()
-  userStore.getUser(res.data)
-  test.value = res.data
-  router.push((router.currentRoute.value.query.returnUrl as string) || '/user')
-  return showSuccessToast('登陆成功')
 }
 
 //获取验证码
@@ -40,39 +46,24 @@ const form = ref<FormInstance>()
 const time = ref(0)
 let timeId = ref()
 const send = async () => {
-  if (time.value > 0) return
-  await form.value?.validate('mobile')
-  // await getCode(mobile.value, 'login')
-  showToast('发送成功')
-  time.value = 60
-  timeId.value = window.setInterval(() => {
-    time.value--
-    if (time.value <= 0) window.clearInterval(timeId.value)
-  }, 1000)
-}
-
-const data = ref()
-const store = useUserStore()
-const car_store = useShopCarStore()
-const LoadData = async () => {
   try {
-    const res = await LoadShopCarApi(store.user?.u_id)
-    data.value = res
-    if (Object.keys(data.value).length > 0) {
-      for (const item of data.value) {
-        const res = await product_itemApi(item.p_id)
-        item.content = res
-      }
-      car_store.getgoodslist(data.value)
-    }
+    if (time.value > 0) return
+    await form.value?.validate('mobile')
+    // await getCode(mobile.value, 'login')
+    showToast('发送成功')
+    time.value = 60
+    timeId.value = window.setInterval(() => {
+      time.value--
+      if (time.value <= 0) window.clearInterval(timeId.value)
+    }, 1000)
   } catch (err) {
     console.log(err)
   }
 }
 
+const car_store = useShopCarStore()
 onUnmounted(() => {
   window.clearInterval(timeId.value)
-  LoadData()
 })
 </script>
 
