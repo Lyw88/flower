@@ -12,7 +12,7 @@ export const useShopCarStore = defineStore(
     //获取商品列表
     const getgoodslist = (data: []) => {
       data.forEach((item: any) => {
-        item.checked = true
+        item.checked = false
       })
       goodslist.value = data
     }
@@ -29,13 +29,9 @@ export const useShopCarStore = defineStore(
       try {
         const res = await LoadShopCarApi(store.user?.u_id)
         data.value = res
-        if (Object.keys(data.value).length > 0) {
-          for (const item of data.value) {
-            const res = await product_itemApi(item.p_id)
-            item.content = res
-          }
-        }
         await getgoodslist(data.value)
+        console.log(data.value)
+
         return
       } catch (err) {
         console.log(err)
@@ -51,16 +47,10 @@ export const useShopCarStore = defineStore(
       }
 
       const total = goodslist.value.reduce((sum, item) => {
-        if (
-          item &&
-          item.checked &&
-          item.quantity &&
-          item.content &&
-          item.content.p_price
-        ) {
+        if (item && item.checked && item.quantity && item.p_price) {
           // @ts-ignore
           selectedItems.value.push(item)
-          sum += item.quantity * item.content.p_price // 计算总价
+          sum += item.quantity * item.p_price // 计算总价
         }
         return sum
       }, 0)

@@ -15,6 +15,7 @@ const info = ref()
 const load = async () => {
   const res = await product_itemApi(route.query.p_id)
   info.value = res
+  console.log(info.value)
 }
 
 //加入购物车
@@ -93,7 +94,6 @@ onMounted(async () => {
         text="加入购物车"
         @click="addshopcar()"
       />
-      <van-action-bar-button type="danger" text="立即购买" />
     </van-action-bar>
   </div>
 </template>

@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import router from '@/router'
+import { OrderSubmitApi } from '@/services/order'
+import { DelProductApi } from '@/services/product'
 import { addressInfoApi } from '@/services/user'
 import { useUserStore } from '@/stores'
 import { orderUseStore } from '@/stores/modules/order'
 import { useShopCarStore } from '@/stores/modules/shopcar'
 import { mobileRules } from '@/utils/rules'
+import { showConfirmDialog, showSuccessToast } from 'vant'
 import { onMounted, ref } from 'vue'
 
 const car_store = useShopCarStore()
@@ -40,6 +44,39 @@ const onSubmit = () => {
 
 //备注
 const notes = ref()
+
+//提交订单
+const OnClickSubmit = () => {
+  showConfirmDialog({
+    message: '已成功支付?'
+  })
+    .then(async () => {
+      try {
+        const o_content = JSON.stringify(car_store.selectedItems)
+        const res = await OrderSubmitApi({
+          u_id: stores.user?.u_id,
+          a_id: order_store.address.id,
+          o_total: car_store.totalPrice / 100,
+          o_time: order_store.time,
+          o_state: true,
+          o_content,
+          orderer: orderer_name.value + ',' + orderer_phone.value,
+          notes: notes.value
+        })
+        showSuccessToast(res.message)
+        await car_store.selectedItems.forEach(async (item) => {
+          await DelProductApi({ u_id: item.u_id, p_id: item.p_id })
+        })
+        await car_store.LoadData()
+        router.push('/shopcar')
+      } catch (err) {
+        console.log(err)
+      }
+    })
+    .catch(() => {
+      // on cancel
+    })
+}
 
 onMounted(() => {
   load_addres()
@@ -158,10 +195,14 @@ onMounted(() => {
         v-for="item in car_store.selectedItems"
         :key="item"
         :num="item?.quantity"
-        :price="item?.content?.p_price"
+        :price="item?.p_price"
         desc="描述信息"
-        :title="item?.content?.p_name"
-        thumb="https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+        :title="item?.p_name"
+        :thumb="
+          item?.p_image != null
+            ? 'http://localhost:3000/upload/' + `${item?.p_image}`
+            : 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg'
+        "
       />
       <div class="think"></div>
       <van-cell
@@ -178,7 +219,11 @@ onMounted(() => {
         placeholder="选填"
       />
     </van-cell-group>
-    <van-submit-bar :price="car_store.totalPrice" button-text="提交订单" />
+    <van-submit-bar
+      :price="car_store.totalPrice"
+      button-text="提交订单"
+      @submit="OnClickSubmit"
+    />
   </div>
 </template>
 
@@ -258,14 +303,21 @@ onMounted(() => {
         text-align: left;
       }
     }
+    margin-bottom: 60px;
+    &::after {
+      content: '';
+      display: block;
+    }
   }
   .van-submit-bar {
-    position: sticky;
     bottom: 0;
   }
   .order-popup {
     padding-top: 55px;
     background-color: #f3f5f7;
   }
+}
+:deep().van-dialog {
+  width: 500px !important;
 }
 </style>

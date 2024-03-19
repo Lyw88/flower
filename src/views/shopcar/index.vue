@@ -9,33 +9,6 @@ import router from '@/router'
 const car_store = useShopCarStore()
 const stores = useUserStore()
 
-// const selectedItems = ref([])
-
-// //订单栏总计
-// const totalPrice = computed(() => {
-//   // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-//   selectedItems.value = [] // 清空selectedItems
-//   if (!data.value || !Array.isArray(data.value)) {
-//     return 0
-//   }
-
-//   const total = data.value.reduce((sum, item) => {
-//     if (
-//       item &&
-//       item.checked &&
-//       item.quantity &&
-//       item.content &&
-//       item.content.p_price
-//     ) {
-//       // @ts-ignore
-//       selectedItems.value.push(item)
-//       sum += item.quantity * item.content.p_price // 计算总价
-//     }
-//     return sum
-//   }, 0)
-//   return total * 100
-// })
-
 //渲染购物车
 const data = ref()
 
@@ -95,13 +68,12 @@ onMounted(() => {
         <van-swipe-cell v-for="item in data" :key="item?.p_id">
           <van-card
             :num="item?.quantity"
-            :price="item?.content?.p_price"
+            :price="item?.p_price"
             desc="描述信息"
-            :title="item?.content?.p_name"
+            :title="item?.p_name"
             :thumb="
-              item?.content?.p_image != null
-                ? 'http://localhost:3000/upload/' +
-                  `${item?.content?.p_image[0]}`
+              item?.p_image != null
+                ? 'http://localhost:3000/upload/' + `${item?.p_image}`
                 : 'https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg'
             "
           >
