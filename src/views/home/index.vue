@@ -21,10 +21,7 @@ const string = ref(
   <div class="home_page">
     <!-- 标题 -->
     <div class="banner">
-      <van-image
-        height="40"
-        src="https://img02.hua.com/m/2021_img/m_home_logo.png"
-      />
+      <van-image height="40" :src="getImageUrl('m_home_logo.png')" />
     </div>
     <!-- 轮播图 -->
     <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">

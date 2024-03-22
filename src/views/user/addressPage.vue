@@ -112,6 +112,8 @@ const onSave = async (content: any) => {
 //删除地址操作
 const onDelete = async (content: any) => {
   try {
+    console.log(content.id)
+
     await deladdressApi(content.id)
     show.value = false
     LoadData()

@@ -3,8 +3,6 @@ import { ref } from 'vue'
 import type { FormInstance } from 'vant'
 import { edituserApi } from '@/services/user'
 import { useUserStore } from '@/stores'
-import { inject } from 'vue'
-const parentFunction = inject<any>('triggerParentFunction')
 
 const emit = defineEmits(['showvalue'])
 const store = useUserStore()
@@ -17,7 +15,7 @@ const onSubmit = async (data: any) => {
   try {
     const res = await edituserApi(data)
     emit('showvalue', false)
-    parentFunction()
+    await store.loadData()
     console.log(res)
   } catch (err) {
     console.log(err)

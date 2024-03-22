@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import router from '@/router'
-import { getuserinfoApi } from '@/services/user'
 import { useUserStore } from '@/stores'
+import { orderUseStore } from '@/stores/modules/order'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
 
 const store = useUserStore()
-
-// 加载数据
-const user_info = ref()
-const loadData = async () => {
-  try {
-    const res = await getuserinfoApi(store.user?.u_id || 0)
-    user_info.value = res.data
-  } catch (err) {
-    console.log(err)
-  }
-}
+const order_store = orderUseStore()
 
 // 退出登录
 const logout = () => {
@@ -33,25 +23,10 @@ const showPopup = () => {
 const showRightchange = (newval: boolean) => {
   showRight.value = newval
 }
-//转64
-// async function objectUrlToBase64(objectUrl) {
-//   const response = await fetch(objectUrl)
-//   const blob = await response.blob()
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader()
-//     reader.readAsDataURL(blob)
-//     reader.onloadend = () => {
-//       resolve(reader.result)
-//     }
-//     reader.onerror = reject
-//   })
-// }
 
-import { provide } from 'vue'
-provide('triggerParentFunction', loadData)
-
-onMounted(() => {
-  loadData()
+onMounted(async () => {
+  await store.loadData()
+  await order_store.o_stateCount()
 })
 </script>
 
@@ -65,13 +40,13 @@ onMounted(() => {
           fit="cover"
           position="center"
           :src="
-            user_info?.u_avatar != null
-              ? 'data:image/png;base64,' + user_info?.u_avatar
+            store.user_info?.u_avatar != null
+              ? 'data:image/png;base64,' + store.user_info?.u_avatar
               : 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
           "
         />
         <div class="name">
-          <p>{{ user_info?.u_name || '用户907456' }}</p>
+          <p>{{ store.user_info?.u_name || '用户907456' }}</p>
           <p><van-icon name="edit" /></p>
         </div>
       </div>
@@ -80,16 +55,22 @@ onMounted(() => {
     <div class="panel">
       <div class="head">
         <h3>我的订单</h3>
-        <p>全部订单<van-icon name="arrow" /></p>
+        <p @click="$router.push('/allorder')">
+          全部订单<van-icon name="arrow" />
+        </p>
       </div>
       <div class="body">
         <van-row justify="center" align="center">
           <van-col span="8">
-            <cp-icon name="user-待付款" />
+            <van-badge :content="order_store?.state_count[0]?.count || ''">
+              <cp-icon name="user-待付款" />
+            </van-badge>
             <p>待付款</p>
           </van-col>
           <van-col span="8">
-            <cp-icon name="user-进行中" />
+            <van-badge :content="order_store?.state_count[1]?.count || ''">
+              <cp-icon name="user-进行中" />
+            </van-badge>
             <p>进行中</p>
           </van-col>
           <van-col span="8">
@@ -103,15 +84,15 @@ onMounted(() => {
     <div class="user-info">
       <van-row>
         <van-col span="8">
-          <p>{{ user_info?.u_integral || 0 }}</p>
+          <p>{{ store.user_info?.u_integral || 0 }}</p>
           <p>积分</p>
         </van-col>
         <van-col span="8">
-          <p>{{ user_info?.u_coupon || 0 }}</p>
+          <p>{{ store.user_info?.u_coupon || 0 }}</p>
           <p>优惠券</p>
         </van-col>
         <van-col span="8">
-          <p>{{ user_info?.u_collect || 0 }}</p>
+          <p>{{ store.user_info?.u_collect || 0 }}</p>
           <p>收藏</p>
         </van-col>
       </van-row>
@@ -144,10 +125,7 @@ onMounted(() => {
       position="right"
       :style="{ height: '100%', width: '100%' }"
     >
-      <userEditPage
-        @valueChanged="showRightchange"
-        :userinfo="user_info"
-      ></userEditPage>
+      <userEditPage @valueChanged="showRightchange"></userEditPage>
     </van-popup>
   </div>
 </template>

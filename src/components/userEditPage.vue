@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import { ref, inject } from 'vue'
+import { ref } from 'vue'
 import UserEditForm from './userEditForm.vue'
-import { onMounted } from 'vue'
 import { edituserApi } from '@/services/user'
 import { useUserStore } from '@/stores'
 
-//触发父组件重新渲染
-const parentFunction = inject<any>('triggerParentFunction')
-
 //用户持久化数据
 const store = useUserStore()
-
-const prop = defineProps({
-  userinfo: Object
-})
 
 const emit = defineEmits(['valueChanged'])
 
@@ -36,13 +28,11 @@ const afterRead = async (data: any) => {
       u_id: store.user?.u_id
     })
     console.log(res)
-    parentFunction()
+    await store.loadData()
   } catch (err) {
     console.log(err)
   }
 }
-
-onMounted(() => console.log(prop.userinfo))
 </script>
 
 <template>
@@ -68,8 +58,8 @@ onMounted(() => console.log(prop.userinfo))
                 fit="cover"
                 round
                 :src="
-                  prop.userinfo?.u_avatar != null
-                    ? 'data:image/png;base64,' + prop.userinfo?.u_avatar
+                  store.user_info?.u_avatar != null
+                    ? 'data:image/png;base64,' + store.user_info?.u_avatar
                     : 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg'
                 "
               />
@@ -80,7 +70,7 @@ onMounted(() => console.log(prop.userinfo))
       <van-cell
         title="昵称"
         is-link
-        :value="prop.userinfo?.u_name"
+        :value="store.user_info?.u_name"
         @click="showPopup"
       />
     </van-cell-group>
