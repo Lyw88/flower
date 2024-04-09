@@ -62,15 +62,11 @@ onMounted(async () => {
       <div class="body">
         <van-row justify="center" align="center">
           <van-col span="8">
-            <van-badge :content="order_store?.state_count[0]?.count || ''">
-              <cp-icon name="user-待付款" />
-            </van-badge>
+            <cp-icon name="user-待付款" />
             <p>待付款</p>
           </van-col>
           <van-col span="8">
-            <van-badge :content="order_store?.state_count[1]?.count || ''">
               <cp-icon name="user-进行中" />
-            </van-badge>
             <p>进行中</p>
           </van-col>
           <van-col span="8">
